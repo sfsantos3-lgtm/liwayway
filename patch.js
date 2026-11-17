@@ -493,6 +493,9 @@ const backendUi = String.raw`(async function(){
   window.liwaywaySupabase = db;
 
   async function currentUser(){
+    const sessionResult=await db.auth.getSession();
+    if(sessionResult.error) throw sessionResult.error;
+    if(!sessionResult.data.session) return null;
     const result=await db.auth.getUser();
     if(result.error) throw result.error;
     return result.data.user;
