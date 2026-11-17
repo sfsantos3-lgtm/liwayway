@@ -675,3 +675,37 @@ formsBackendFixed = formsBackendFixed.replace(
 fs.writeFileSync(path.join(root, 'forms-backend.js'), formsBackendFixed);
 fsCheck.execFileSync(process.execPath, ['--check', path.join(root, 'forms-backend.js')]);
 console.log('Authenticated-user flow and assessment field scoping validated.');
+
+
+// Update the Bukang Liwayway copy now that secure test submissions are wired.
+const formsPagePath = path.join(root, 'forms-page.js');
+if (fs.existsSync(formsPagePath)) {
+  let formsPageSource = fs.readFileSync(formsPagePath, 'utf8');
+  formsPageSource = formsPageSource.replace(
+    'Preview only: form responses are not sent or saved yet. The secure submission system will be connected in the backend phase.',
+    'Testing mode: submissions require a signed-in test account and are stored in your private Liwayway database. Use fictional sample responses only; do not enter real clinical or highly sensitive information.'
+  );
+  formsPageSource = formsPageSource.replace(
+    'Preview complete. No information has been sent or stored. Appointment submission will be enabled after the secure backend is connected.',
+    'Testing mode: appointment requests are submitted to your private test account. Use fictional sample details only.'
+  );
+  fs.writeFileSync(formsPagePath, formsPageSource);
+}
+
+// Persist the registration privacy acknowledgement in the consent ledger.
+let accountBackend = fs.readFileSync(path.join(root, 'backend-ui.js'), 'utf8');
+accountBackend = accountBackend.replace(
+  "try{const {error}=await db.auth.signInWithPassword({email:data.get('email'),password:data.get('password')});if(error)throw error;location.href='/user-dashboard.html';}",
+  "try{const {data:authData,error}=await db.auth.signInWithPassword({email:data.get('email'),password:data.get('password')});if(error)throw error;const meta=authData.user.user_metadata||{};if(meta.privacy_consent){const prior=await db.from('consent_records').select('id').eq('user_id',authData.user.id).eq('consent_type','platform_privacy').eq('policy_version',meta.privacy_policy_version||'preview-test-v1').is('revoked_at',null).maybeSingle();if(prior.error)throw prior.error;if(!prior.data){const saved=await db.from('consent_records').insert({user_id:authData.user.id,consent_type:'platform_privacy',policy_version:meta.privacy_policy_version||'preview-test-v1'});if(saved.error)throw saved.error;}}location.href='/user-dashboard.html';}"
+);
+accountBackend = accountBackend.replace(
+  "options:{data:{full_name:data.get('full_name')},emailRedirectTo:location.origin+'/account.html'}",
+  "options:{data:{full_name:data.get('full_name'),privacy_consent:true,privacy_policy_version:'preview-test-v1'},emailRedirectTo:location.origin+'/account.html'}"
+);
+accountBackend = accountBackend.replace(
+  "if(error)throw error;\n        if(result.session){location.href='/user-dashboard.html';return;}",
+  "if(error)throw error;\n        if(result.session){const saved=await db.from('consent_records').insert({user_id:result.user.id,consent_type:'platform_privacy',policy_version:'preview-test-v1'});if(saved.error)throw saved.error;location.href='/user-dashboard.html';return;}"
+);
+fs.writeFileSync(path.join(root, 'backend-ui.js'), accountBackend);
+fsCheck.execFileSync(process.execPath, ['--check', path.join(root, 'backend-ui.js')]);
+console.log('Updated form status copy and privacy-consent recording.');
