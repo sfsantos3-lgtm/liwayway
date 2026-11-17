@@ -709,3 +709,11 @@ accountBackend = accountBackend.replace(
 fs.writeFileSync(path.join(root, 'backend-ui.js'), accountBackend);
 fsCheck.execFileSync(process.execPath, ['--check', path.join(root, 'backend-ui.js')]);
 console.log('Updated form status copy and privacy-consent recording.');
+
+let formsBackendConsent = fs.readFileSync(path.join(root, 'forms-backend.js'), 'utf8');
+formsBackendConsent = formsBackendConsent.replace(
+  "options:{data:{full_name:fd.get('fullName')},emailRedirectTo:location.origin+'/account.html'}",
+  "options:{data:{full_name:fd.get('fullName'),privacy_consent:true,privacy_policy_version:'preview-test-v1'},emailRedirectTo:location.origin+'/account.html'}"
+);
+fs.writeFileSync(path.join(root, 'forms-backend.js'), formsBackendConsent);
+fsCheck.execFileSync(process.execPath, ['--check', path.join(root, 'forms-backend.js')]);
