@@ -469,7 +469,7 @@ const supabasePublicConfig = {
 fs.writeFileSync(path.join(root, 'supabase-config.js'),
   'window.LIWAYWAY_SUPABASE_CONFIG = ' + JSON.stringify(supabasePublicConfig) + ';');
 
-const backendUi = String.raw`(function(){
+const backendUi = String.raw`(async function(){
   const config = window.LIWAYWAY_SUPABASE_CONFIG || {};
   const path = location.pathname.split('/').pop() || 'index.html';
   const app = window.supabase;
