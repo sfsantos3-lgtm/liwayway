@@ -256,3 +256,28 @@ for(const file of ['index.html','about.html','services.html','community.html','r
  if(!html.includes('extended-nav.js'))html=html.replace('</body>','<script src="/extended-nav.js" defer></script></body>');
  fs.writeFileSync(p,html);
 }
+
+
+// Ensure the expanded navigation is available from the existing six primary pages.
+let navJsPath = path.join(root, 'extended-nav.js');
+let navJs = fs.readFileSync(navJsPath, 'utf8');
+navJs = navJs.replace(
+  "const mount=document.getElementById('lx-app');\nif(!mount)return;",
+  "const mount=document.getElementById('lx-app');\nif(!mount){const existing=document.querySelector('.navlinks');if(existing&&!existing.dataset.liwaywayExpanded){existing.insertAdjacentHTML('beforeend','<a href=\"/behind-liwayway.html\">Behind Liwayway</a><a href=\"/shared-liwayway.html\">Shared Liwayway</a><a href=\"/steps-with-liwayway.html\">Steps with Liwayway</a><a href=\"/takipsilim.html\">Takipsilim</a><a href=\"/post-assessment.html\">Post-Counseling Assessment</a><a href=\"/tala-at-saloobin.html\">Tala at Saloobin</a><a href=\"/account.html\">Login / Register</a>');existing.dataset.liwaywayExpanded='true';}return;}"
+);
+fs.writeFileSync(navJsPath,navJs);
+
+// Additional standalone pages for the requested help-center structure.
+const extraPages = {
+ "tanglaw-ng-kaalaman.html":["Tanglaw ng Kaalaman","Mental health learning and guidance.",[["Educational resources",["Mental health articles","Educational resources","Liwayway guidelines","Step-by-step guides"]]]],
+ "data-privacy.html":["Data Privacy and Consent","Information about privacy, data use, confidentiality, and consent.",[["Privacy and confidentiality",["Privacy policy","Data collection and usage","Confidentiality policy","User consent","Limitations of confidentiality"]]]],
+ "frequently-asked-questions.html":["Frequently Asked Questions","Common questions about Liwayway and its services.",[["About Liwayway",["About Liwayway"]],["Account registration",["Account registration"]],["Counseling services",["Counseling services"]],["Other services",["Other services"]],["Privacy and confidentiality",["Privacy and confidentiality"]],["Client support",["Client support"]],["Reviews and feedback",["Reviews and feedback"]]]],
+ "crisis-support.html":["Crisis Support","If you need immediate mental health support, you may contact the hotlines listed below.",[["National Center for Mental Health",["National Center for Mental Health Crisis Hotline: 1553","Alternative hotline: 1800-1888-1553"]]]],
+ "user-dashboard.html":["User Dashboard","Account, appointment, assessment, journal, and progress features.",[["Account",["User profile","Account settings"]],["Counseling",["Appointment management","Appointment status tracking","Counseling history"]],["Personal records",["Assessment history","Personal journal management","Progress tracking"]],["Community",["Event registration management","Review and feedback management"]]]],
+ "professional-dashboard.html":["Mental Health Professional Dashboard","Professional-facing workflow overview.",[["Professional tools",["Appointment management","Counseling history","Assessment history","Progress tracking"]]]],
+ "administrator-dashboard.html":["Administrator Dashboard","Administrative workflow overview.",[["Administration",["Appointment management","Appointment status tracking","Notifications and reminders","Event registration management","Review and feedback management"]]]]
+};
+for(const [file,p] of Object.entries(extraPages)){
+ const body='<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+p[0]+' — Liwayway</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet"></head><body><div id="lx-app"></div><script src="/extended-nav.js" defer></script></body></html>';
+ fs.writeFileSync(path.join(root,file),body);
+}
