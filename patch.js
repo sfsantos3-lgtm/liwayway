@@ -615,3 +615,15 @@ const addBackendScripts = file => {
   }
 };
 ['account.html','journal.html','tala-at-saloobin.html','user-dashboard.html'].forEach(addBackendScripts);
+
+
+// Repair a newline escape in the generated journal renderer before syntax validation.
+let finalNavScript = fs.readFileSync(path.join(root, 'extended-nav.js'), 'utf8');
+finalNavScript = finalNavScript.replace(
+  'replace(/' + String.fromCharCode(10) + '/g',
+  'replace(/' + String.fromCharCode(92) + 'n/g'
+);
+fs.writeFileSync(path.join(root, 'extended-nav.js'), finalNavScript);
+fsCheck.execFileSync(process.execPath, ['--check', path.join(root, 'extended-nav.js')]);
+fsCheck.execFileSync(process.execPath, ['--check', path.join(root, 'backend-ui.js')]);
+console.log('Generated navigation and backend UI JavaScript syntax checks passed.');
