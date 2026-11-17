@@ -93,7 +93,7 @@ appSource = appSource.replace(
 );
 appSource = appSource.replace(
   '<div class="hero-art">',
-  '<div class="hero-art"><img class="art-florals" src="\${florals}" alt="">'
+  '<div class="hero-art"><img class="art-florals" src="${florals}" alt="">'
 );
 appSource = appSource.replace(
   '<article class="card service-card yellow"><div class="step">01 · Before the session</div>',
@@ -149,15 +149,16 @@ appSource = appSource.replace(
 );
 appSource = appSource.replace(
   '<div class="values"><div class="value">',
-  '<img class="icon-sheet" src="\${iconSheet}" alt="Liwayway health, learning, and support icons"><div class="values"><div class="value">'
+  '<img class="icon-sheet" src="${iconSheet}" alt="Liwayway health, learning, and support icons"><div class="values"><div class="value">'
 );
 fs.writeFileSync(appPath, appSource);
-fs.appendFileSync(path.join(root, 'styles.css'), \`
-.art-florals{position:absolute;width:118px;height:118px;object-fit:contain;right:8%;top:2%;opacity:.9;z-index:1;pointer-events:none}
-.service-graphic{width:76px;height:76px;object-fit:contain;margin:0 0 14px}
-.section-graphic{width:82px;height:82px;object-fit:contain;margin:0 0 18px}
-.icon-sheet{display:block;width:min(100%,520px);max-height:190px;object-fit:contain;margin:0 auto 26px;mix-blend-mode:multiply}
-.contact-graphic{width:72px;height:72px;object-fit:contain;margin-bottom:18px;filter:brightness(0) invert(1)}
-@media(max-width:700px){.art-florals{width:82px;height:82px;right:0;top:0}.service-graphic{width:64px;height:64px}.section-graphic{width:68px;height:68px}.icon-sheet{max-height:150px}}
-\`);
+fs.appendFileSync(path.join(root, 'styles.css'), [
+'.art-florals{position:absolute;width:118px;height:118px;object-fit:contain;right:8%;top:2%;opacity:.9;z-index:1;pointer-events:none}',
+'.service-graphic{width:76px;height:76px;object-fit:contain;margin:0 0 14px}',
+'.section-graphic{width:82px;height:82px;object-fit:contain;margin:0 0 18px}',
+'.icon-sheet{display:block;width:min(100%,520px);max-height:190px;object-fit:contain;margin:0 auto 26px;mix-blend-mode:multiply}',
+'.contact-graphic{width:72px;height:72px;object-fit:contain;margin-bottom:18px;filter:brightness(0) invert(1)}',
+'@media(max-width:700px){.art-florals{width:82px;height:82px;right:0;top:0}.service-graphic{width:64px;height:64px}.section-graphic{width:68px;height:68px}.icon-sheet{max-height:150px}}'
+].join('\\n'));
+
 fsCheck.execFileSync(process.execPath, ['--check', appPath]);
