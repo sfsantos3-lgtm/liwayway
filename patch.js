@@ -623,7 +623,7 @@ finalNavScript = finalNavScript.replace(
   'replace(/' + String.fromCharCode(10) + '/g',
   'replace(/' + String.fromCharCode(92) + 'n/g'
 );
-finalNavScript = finalNavScript.replace(/onclick="alert\\('[^"]*'\\)"/g, 'disabled');
+finalNavScript = finalNavScript.replace(/onclick="alert\('[^"]*'\)"/g, 'disabled');
 fs.writeFileSync(path.join(root, 'extended-nav.js'), finalNavScript);
 fsCheck.execFileSync(process.execPath, ['--check', path.join(root, 'extended-nav.js')]);
 fsCheck.execFileSync(process.execPath, ['--check', path.join(root, 'backend-ui.js')]);
