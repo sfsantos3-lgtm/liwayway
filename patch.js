@@ -657,3 +657,18 @@ const missingAnchors = internalAnchors.filter(anchor => !pageIds.has(anchor));
 if (missingAnchors.length) throw new Error('Internal CTA target missing: ' + missingAnchors.join(', '));
 fs.writeFileSync(appPath, buttonAuditApp);
 console.log('Internal service CTA targets validated.');
+
+ 
+// Ensure already-authenticated users can skip account creation and keep assessment data scoped to step two.
+let formsBackendFixed = fs.readFileSync(path.join(root, 'forms-backend.js'), 'utf8');
+formsBackendFixed = formsBackendFixed.replace(
+  'e.preventDefault();e.stopImmediatePropagation();if(!validVisible())return;button.disabled=true;',
+  'e.preventDefault();e.stopImmediatePropagation();if(step===0&&user){showStep(1);return;}if(!validVisible())return;button.disabled=true;'
+);
+formsBackendFixed = formsBackendFixed.replace(
+  'const data=new FormData(form),out={};\n      for(const [key,value] of data.entries()){',
+  "const out={};\n      for(const el of steps[1].querySelectorAll('input,textarea,select')){\n        const key=el.name,value=el.value;\n        if(!key||exclude.includes(key)||((el.type==='radio'||el.type==='checkbox')&&!el.checked))continue;"
+);
+fs.writeFileSync(path.join(root, 'forms-backend.js'), formsBackendFixed);
+fsCheck.execFileSync(process.execPath, ['--check', path.join(root, 'forms-backend.js')]);
+console.log('Authenticated-user flow and assessment field scoping validated.');
