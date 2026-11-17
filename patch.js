@@ -382,3 +382,39 @@ fs.appendFileSync(path.join(root,'styles.css'), `
 `);
 fsCheck.execFileSync(process.execPath,['--check',appPath]);
 console.log('Local graphics, dropdown navigation, and demo-content safeguards added.');
+
+
+// Final demo-content labels and navigation anchors.
+let finalApp = fs.readFileSync(appPath, 'utf8');
+const finalReplacements = [
+ ['<h3>Dr. (?)</h3>','<h3>Dr. Amara Reyes <small>(fictional demo)</small></h3>'],
+ ['<h3>(name), RPsy</h3>','<h3>Dr. Miguel Santos, RPsy <small>(fictional demo)</small></h3>'],
+ ['<h3>(name), RPm</h3>','<h3>Leah Navarro, RPm <small>(fictional demo)</small></h3>'],
+ ['<span class="tag">Guidance Counselor</span><h3>(name)</h3>','<span class="tag">Guidance Counselor</span><h3>Carlo Villanueva <small>(fictional demo)</small></h3>'],
+ ['<span class="tag">Founder / Executive Director</span><h3>name</h3>','<span class="tag">Founder / Executive Director</span><h3>Elena Cruz <small>(fictional demo)</small></h3>'],
+ ['<span class="tag">Administrative Assistant / Client Relations Manager</span><h3>name</h3>','<span class="tag">Administrative Assistant / Client Relations Manager</span><h3>Paolo Garcia <small>(fictional demo)</small></h3>'],
+ ['<span class="tag">Healthcare Staff</span><h3>name, rn</h3>','<span class="tag">Healthcare Staff</span><h3>Bianca Flores, RN <small>(fictional demo)</small></h3>'],
+ ['<span class="tag">System manager</span><h3>name</h3>','<span class="tag">System manager</span><h3>Adrian Lim <small>(fictional demo)</small></h3>'],
+ ['Bachelor’s Degree in Psychology · Master’s Degree in Organizational Psychology','Sample background — fictional demo only'],
+ ['Bachelor’s Degree in Psychology','Sample background — fictional demo only'],
+ ['Bachelor’s degree in Nursing · Registered Nurse','Sample background — fictional demo only'],
+ ['Bachelor’s degree in information technology (IT)','Sample background — fictional demo only'],
+ ['Has 6 years of experience in mental health advocacy and organizational leadership. Founded Liwayway with the goal of making mental health services more accessible through online platforms.','Fictional sample biography only. Replace with verified details before publication.'],
+ ['Has 3 years of experience handling client inquiries, appointment scheduling, and online services coordination.','Fictional sample biography only. Replace with verified details before publication.'],
+ ['Has 4 years of experience in healthcare support and patient coordination. Assists in ensuring that clients receive proper support and referrals when necessary.','Fictional sample biography only. Replace with verified details before publication.'],
+ ['Certified in basic cybersecurity and data privacy practices. Has 4 years of experience in website administration and information security.','Fictional sample biography only. Replace with verified details before publication.'],
+ ['To maintain its free online counseling services, Liwayway receives support through proposed partnerships and sponsorships from organizations that advocate for mental health awareness and accessibility.','Liwayway may seek support through partnerships and sponsorships from organizations that advocate for mental health awareness and accessibility. The examples below are fictional placeholders and do not indicate actual affiliations.'],
+ ['Non-Governmental Organizations (NGOs)','Sample non-governmental partner (fictional demo)'],
+ ['Non-profit organizations that support mental health programs through advocacy, community outreach, and financial assistance.','Illustrative placeholder only; no actual partnership or affiliation is implied.'],
+ ['Private Donors and Corporate Sponsors','Sample corporate sponsor (fictional demo)'],
+ ['Individuals and private companies willing to provide financial support and resources to help sustain Liwayway’s free online counseling services.','Illustrative placeholder only; no actual sponsorship or funding is implied.'],
+ ['<h3 style="font-size:30px;color:var(--cream)">Sample mental health institution category (fictional demo)</h3>','<h3 style="font-size:30px;color:var(--cream)">National Center for Mental Health (NCMH)</h3>'],
+ ['Check out our upcoming sessions and register for the live discussions.','Check out our upcoming sessions and register for the live discussions.<div class="notice" style="margin-top:14px"><b>Sample Lightalk schedule — fictional demo only; these are not confirmed events.</b><ul><li>Lightalk: Understanding Emotional Well-being · December 5, 2026 · 10:00 AM</li><li>Lightalk: Healthy Coping Strategies · December 12, 2026 · 2:00 PM</li><li>Lightalk: Building Supportive Connections · December 19, 2026 · 10:00 AM</li></ul>Event descriptions, speakers, and registration details must be confirmed before publication.</div>'],
+ ['id="registration"','id="lightalk"'],
+ ['href="#registration"','href="#lightalk"'],
+ ['id="donate"','id="kapwa"'],
+ ['href="#donate"','href="#kapwa"']
+];
+for(const [before,after] of finalReplacements) finalApp=finalApp.replaceAll(before,after);
+fs.writeFileSync(appPath,finalApp);
+fsCheck.execFileSync(process.execPath,['--check',appPath]);
