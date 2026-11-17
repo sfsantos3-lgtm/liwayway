@@ -281,3 +281,13 @@ for(const [file,p] of Object.entries(extraPages)){
  const body='<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+p[0]+' — Liwayway</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet"></head><body><div id="lx-app"></div><script src="/extended-nav.js" defer></script></body></html>';
  fs.writeFileSync(path.join(root,file),body);
 }
+
+navJs = navJs.replace(
+ "const pages="+JSON.stringify(extendedPages)+";",
+ "const pages="+JSON.stringify(Object.assign({},extendedPages,extraPages))+";"
+);
+navJs = navJs.replace(
+ "'<a href=\"/account.html\">Login / Register</a>'",
+ "'<a href=\"/account.html\">Login / Register</a><a href=\"/tanglaw-ng-kaalaman.html\">Tanglaw ng Kaalaman</a><a href=\"/data-privacy.html\">Data Privacy</a><a href=\"/frequently-asked-questions.html\">FAQs</a><a href=\"/crisis-support.html\">Crisis Support</a><a href=\"/user-dashboard.html\">User Dashboard</a>'"
+);
+fs.writeFileSync(navJsPath,navJs);
