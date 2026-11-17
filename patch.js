@@ -162,3 +162,97 @@ fs.appendFileSync(path.join(root, 'styles.css'), [
 ].join('\\n'));
 
 fsCheck.execFileSync(process.execPath, ['--check', appPath]);
+
+
+// Expanded Liwayway information architecture and service flows.
+const extendedPages = {
+  "behind-liwayway.html": ["Behind Liwayway", "The people and institutions behind Liwayway.", [
+    ["Mental health professionals", ["Psychiatrist", "Registered Psychologist (RPsy)", "Registered Psychometrician (RPm)", "Guidance Counselor"]],
+    ["Organization staff", ["Founder / Executive Director", "Administrative and Client Relations Manager", "Healthcare Staff", "System Manager"]],
+    ["Partner institutions", ["Partner institutions"]],
+    ["Sponsors and partner organizations", ["Sponsors and partner organizations"]]
+  ]],
+  "shared-liwayway.html": ["Shared Liwayway", "Community, learning, and shared experiences.", [
+    ["Lightalk", ["Online talks and webinars", "Mental health discussions", "Upcoming events, descriptions, and schedules", "Event registration", "Related articles and educational materials"]],
+    ["Kapwa", ["Community support circles", "Workshops", "Community outreach programs", "Volunteer opportunities", "Donation opportunities", "Community mental health resources"]],
+    ["Liwayway Reviews", ["Client reviews", "Voluntary ratings", "Feedback submission", "Testimonials"]]
+  ]],
+  "steps-with-liwayway.html": ["Steps with Liwayway", "Guides, privacy information, and support.", [
+    ["Tanglaw ng Kaalaman", ["Mental health articles", "Educational resources", "Liwayway guidelines", "Step-by-step guides"]],
+    ["Data Privacy and Consent", ["Privacy policy", "Data collection and usage", "Confidentiality policy", "User consent", "Limitations of confidentiality"]],
+    ["Frequently Asked Questions", ["About Liwayway", "Account registration", "Counseling services", "Other services", "Privacy and confidentiality", "Client support", "Reviews and feedback"]],
+    ["Crisis Support", ["National Center for Mental Health Crisis Hotline: 1553", "Alternative hotline: 1800-1888-1553"]]
+  ]],
+  "takipsilim.html": ["Takipsilim — After the Session", "Follow-up and reflection after counseling.", [
+    ["Post-counseling assessment", ["Follow-up questions about the counseling experience", "Current emotional condition", "Changes in mood and behavior", "Progress after counseling", "Effectiveness of coping strategies", "Areas that still need improvement", "Additional concerns or feedback"]],
+    ["Follow-up evaluation", ["Follow-up evaluation"]],
+    ["Therapeutic activities", ["Therapeutic activities"]],
+    ["Coping progress monitoring", ["Coping progress monitoring"]],
+    ["Reflection and feedback", ["Reflection and feedback"]]
+  ]],
+  "tala-at-saloobin.html": ["Tala at Saloobin — Personal Journal", "A personal space for reflection and writing.", [
+    ["Journal features", ["Private journal", "Guided journal prompts", "Create and save entries", "View previous entries", "Edit and delete entries"]]
+  ]],
+  "help-center.html": ["Help Center", "Find information and support through Liwayway.", [
+    ["Tanglaw ng Kaalaman", ["Mental health articles", "Educational resources", "Liwayway guidelines", "Step-by-step guides"]],
+    ["Data Privacy and Consent", ["Privacy policy", "Data collection and usage", "Confidentiality policy", "User consent", "Limitations of confidentiality"]],
+    ["Frequently Asked Questions", ["About Liwayway", "Account registration", "Counseling services", "Other services", "Privacy and confidentiality", "Client support", "Reviews and feedback"]],
+    ["Contact Information", ["Contact details", "Email address", "Social media links", "Office address", "Contact form"]],
+    ["Crisis Support", ["National Center for Mental Health Crisis Hotline: 1553", "Alternative hotline: 1800-1888-1553"]]
+  ]]
+};
+const pageNav = '<header class="lx-header"><a class="lx-brand" href="/"><span class="lx-sun">✳</span> Liwayway</a><nav><a href="/">Home</a><a href="/about.html">About</a><a href="/behind-liwayway.html">Behind Liwayway</a><a href="/services.html">Services</a><a href="/shared-liwayway.html">Shared Liwayway</a><a href="/steps-with-liwayway.html">Steps with Liwayway</a><a href="/contact.html#contact-infos">Contact Us</a><a class="lx-login" href="/account.html">Login / Register</a></nav></header>';
+const extendedStyle = `
+:root{--lx-ink:#352b27;--lx-muted:#77665b;--lx-cream:#fff6e7;--lx-yellow:#f7d86a;--lx-orange:#ee8b3d;--lx-coral:#ef8e83;--lx-line:#eadbca}
+.lx-body{margin:0;background:var(--lx-cream);color:var(--lx-ink);font-family:Karla,Arial,sans-serif}
+.lx-header{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:18px max(4vw,22px);background:rgba(255,246,231,.94);border-bottom:1px solid var(--lx-line);backdrop-filter:blur(14px)}
+.lx-brand{font:700 26px Fraunces,Georgia,serif;color:var(--lx-ink);text-decoration:none;white-space:nowrap}.lx-sun{color:var(--lx-orange);margin-right:7px}
+.lx-header nav{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:14px}.lx-header nav a{font-size:12px;font-weight:700;color:var(--lx-ink);text-decoration:none}.lx-header nav a:hover{color:#b65f35}.lx-header nav .lx-login{background:var(--lx-orange);padding:10px 14px;border-radius:99px}
+.lx-hero{padding:72px max(7vw,24px) 64px;background:linear-gradient(115deg,#fae8a7,#f5c18d 60%,#f5d0c9)}.lx-eyebrow{text-transform:uppercase;letter-spacing:.15em;font-size:10px;font-weight:700;color:#87583d}.lx-hero h1{font:600 clamp(42px,6vw,72px)/1.05 Fraunces,Georgia,serif;margin:15px 0}.lx-hero p{max-width:720px;color:#614c40;font-size:17px;line-height:1.65}
+.lx-wrap{max-width:1080px;margin:0 auto;padding:54px 24px 90px}.lx-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.lx-card{padding:26px;border:1px solid var(--lx-line);border-radius:20px;background:#fffaf2}.lx-card h2{font:600 27px Fraunces,Georgia,serif;margin:0 0 12px}.lx-card ul{margin:0;padding-left:19px;color:var(--lx-muted);line-height:1.9}.lx-cta{display:inline-block;margin-top:18px;padding:13px 18px;border-radius:99px;background:var(--lx-orange);color:#30251e;text-decoration:none;font-size:13px;font-weight:700}.lx-footer{padding:25px 5vw;border-top:1px solid var(--lx-line);color:var(--lx-muted);font-size:12px}
+.lx-form{max-width:820px;margin:auto;padding:28px;border-radius:20px;background:#fffaf2;border:1px solid var(--lx-line)}.lx-form h2{font:600 30px Fraunces,Georgia,serif}.lx-field{display:block;margin:17px 0;font-size:13px;font-weight:700}.lx-field input,.lx-field textarea,.lx-field select{display:block;width:100%;box-sizing:border-box;margin-top:8px;padding:13px;border:1px solid #dfd3c5;border-radius:10px;background:white;font:14px Karla,Arial}.lx-choice{display:flex;gap:10px;align-items:flex-start;padding:12px;margin:8px 0;border:1px solid var(--lx-line);border-radius:10px;background:#fff;font-size:13px}.lx-choice input{margin-top:3px;accent-color:var(--lx-orange)}.lx-note{padding:15px;background:#fff0d7;border-radius:12px;color:#72563d;font-size:13px;line-height:1.5}.lx-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}.lx-btn{border:0;border-radius:99px;padding:13px 20px;background:var(--lx-orange);font-weight:700;cursor:pointer}.lx-btn.secondary{background:#f6e7d8}.lx-entry{border:1px solid var(--lx-line);border-radius:12px;padding:16px;margin:12px 0;background:white}.lx-entry button{margin-right:8px}.lx-footer a{color:inherit}
+@media(max-width:800px){.lx-header{align-items:flex-start;flex-direction:column}.lx-header nav{justify-content:flex-start;gap:10px}.lx-grid{grid-template-columns:1fr}.lx-hero{padding:48px 24px}.lx-wrap{padding:32px 18px 65px}}
+`;
+const extendedScript = `
+(function(){
+const nav=${JSON.stringify(pageNav)};
+const pages=${JSON.stringify(extendedPages)};
+const style=${JSON.stringify(extendedStyle)};
+const path=location.pathname.split('/').pop()||'index.html';
+const key=path==='post-assessment.html'?'takipsilim.html':path;
+const mount=document.getElementById('lx-app');
+if(!mount)return;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function frame(title,desc,body){document.body.className='lx-body';document.head.insertAdjacentHTML('beforeend','<style>'+style+'</style>');mount.innerHTML=nav+'<section class="lx-hero"><div class="lx-eyebrow">The First Light of a Gentler Tomorrow</div><h1>'+title+'</h1><p>'+desc+'</p></section><main class="lx-wrap">'+body+'</main><footer class="lx-footer">Liwayway · The First Light of a Gentler Tomorrow</footer>';}
+function cards(data){return '<div class="lx-grid">'+data.map(([h,items])=>'<article class="lx-card"><h2>'+esc(h)+'</h2><ul>'+items.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></article>').join('')+'</div>';}
+if(pages[key]){const p=pages[key];let body=cards(p[2]);if(key==='takipsilim.html')body+='<p><a class="lx-cta" href="/post-assessment.html">Open post-counseling assessment</a></p>';if(key==='tala-at-saloobin.html')body+='<p><a class="lx-cta" href="/journal.html">Open personal journal</a></p>';frame(p[0],p[1],body);return;}
+if(key==='post-assessment.html'){
+const questions=[['How would you describe your current emotional condition?',['Much better','A little better','About the same','More difficult','Unsure']],['Have you noticed changes in your mood or behavior since counseling?',['Positive changes','Some changes','No noticeable changes','Changes have been difficult','Unsure']],['How would you describe your progress after counseling?',['Significant progress','Some progress','A little progress','No progress yet','Unsure']],['How effective have your coping strategies been?',['Very effective','Somewhat effective','Not very effective','Not effective','I have not tried them yet']],['What areas do you feel still need improvement?',['Managing emotions','Stress management','Relationships','Daily activities','Building coping strategies','Other / not sure']]];
+const q=questions.map((v,i)=>'<fieldset class="lx-field"><legend>'+(i+1)+'. '+v[0]+'</legend>'+v[1].map(x=>'<label class="lx-choice"><input type="radio" name="q'+i+'" value="'+esc(x)+'" required>'+esc(x)+'</label>').join('')+'</fieldset>').join('');
+frame('Post-Counseling Assessment','Takipsilim · After the session. Share how you are feeling after counseling and what support may still be helpful.','<form class="lx-form" id="post-form"><h2>Follow-up assessment</h2>'+q+'<label class="lx-field">How was your counseling experience?<textarea rows="4" name="experience" placeholder="Your response"></textarea></label><label class="lx-field">Additional concerns or feedback<textarea rows="4" name="feedback" placeholder="Your response"></textarea></label><p class="lx-note">Preview only. This form does not submit or store sensitive responses. A secure, private backend must be connected before use.</p><div class="lx-actions"><button class="lx-btn" type="submit">Review responses</button></div><p id="post-result" aria-live="polite"></p></form>');
+document.getElementById('post-form').addEventListener('submit',e=>{e.preventDefault();if(!e.target.reportValidity())return;document.getElementById('post-result').textContent='Your responses are complete in this preview. Nothing has been transmitted or saved.';});return;
+}
+if(key==='journal.html'){
+frame('Tala at Saloobin','Your personal journal space. Draft entries in this preview and explore the journal controls.','<div class="lx-form"><h2>Write an entry</h2><label class="lx-field">Journal title<input id="j-title" required placeholder="Title of your entry"></label><label class="lx-field">Date<input id="j-date" type="date"></label><label class="lx-field">Journal entry<textarea id="j-content" rows="8" required placeholder="Write your thoughts here..."></textarea></label><div class="lx-actions"><button class="lx-btn" id="j-save">Save entry in this session</button></div><p class="lx-note">Privacy notice: entries are held only in this page session and are not sent to a server or saved to an account. Do not enter sensitive personal information until secure account storage is available.</p><h2>Previous entries</h2><div id="j-list">No entries in this session yet.</div></div>');
+let entries=[],edit=-1;const list=document.getElementById('j-list');document.getElementById('j-save').onclick=()=>{const title=document.getElementById('j-title').value.trim(),content=document.getElementById('j-content').value.trim();if(!title||!content){alert('Please enter a title and journal entry.');return;}const item={title,date:document.getElementById('j-date').value,content};if(edit<0)entries.unshift(item);else entries[edit]=item;edit=-1;document.getElementById('j-title').value='';document.getElementById('j-content').value='';render();};function render(){list.innerHTML=entries.length?entries.map((x,i)=>'<article class="lx-entry"><strong>'+esc(x.title)+'</strong><p>'+esc(x.date||'')+'</p><p>'+esc(x.content).replace(/\n/g,'<br>')+'</p><button class="lx-btn secondary" data-edit="'+i+'">Edit</button><button class="lx-btn secondary" data-delete="'+i+'">Delete</button></article>').join(''):'No entries in this session yet.';list.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>{edit=+b.dataset.edit;const x=entries[edit];document.getElementById('j-title').value=x.title;document.getElementById('j-date').value=x.date;document.getElementById('j-content').value=x.content;});list.querySelectorAll('[data-delete]').forEach(b=>b.onclick=()=>{entries.splice(+b.dataset.delete,1);render();});}return;
+}
+if(key==='account.html'){
+frame('Your Liwayway Account','Account access and profile features. Authentication is a prototype until a secure account system is connected.','<div class="lx-grid"><form class="lx-form"><h2>Login</h2><label class="lx-field">School email address<input type="email" required></label><label class="lx-field">Password<input type="password" required></label><a href="#forgot">Forgot password?</a><div class="lx-actions"><button class="lx-btn" type="button" onclick="alert(\'Account login will be enabled after secure authentication is connected.\')">Login</button></div></form><form class="lx-form"><h2>Register</h2><label class="lx-field">Full name<input required></label><label class="lx-field">School email address<input type="email" required></label><label class="lx-field">Password<input type="password" required></label><label class="lx-field">Confirm password<input type="password" required></label><label class="lx-choice"><input type="checkbox" required>I agree to the Privacy Policy and consent notice.</label><div class="lx-actions"><button class="lx-btn" type="button" onclick="alert(\'Registration will be enabled after secure authentication and privacy handling are connected.\')">Create account</button></div></form></div><p class="lx-note">User accounts, password recovery, profiles, dashboards, and login/logout require secure authentication and a protected database. This preview does not collect credentials.</p>');return;
+}
+})();
+`;
+fs.writeFileSync(path.join(root,'extended-nav.js'),extendedScript);
+fs.writeFileSync(path.join(root,'extended.css'),extendedStyle);
+for(const [file] of Object.entries(extendedPages)){
+ const title=extendedPages[file][0];
+ fs.writeFileSync(path.join(root,file),'<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+title+' — Liwayway</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet"></head><body><div id="lx-app"></div><script src="/extended-nav.js" defer></script></body></html>');
+}
+for(const file of ['post-assessment.html','journal.html','account.html']){
+ const title=file.replace('.html','');
+ fs.writeFileSync(path.join(root,file),'<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+title+' — Liwayway</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet"></head><body><div id="lx-app"></div><script src="/extended-nav.js" defer></script></body></html>');
+}
+for(const file of ['index.html','about.html','services.html','community.html','resources.html','contact.html']){
+ const p=path.join(root,file);let html=fs.readFileSync(p,'utf8');
+ if(!html.includes('extended-nav.js'))html=html.replace('</body>','<script src="/extended-nav.js" defer></script></body>');
+ fs.writeFileSync(p,html);
+}
