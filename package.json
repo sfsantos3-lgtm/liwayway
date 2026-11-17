@@ -1,6 +1,6 @@
 {
   "private": true,
   "scripts": {
-    "build": "mkdir -p public && tar -xzf liwayway-site.tar.gz -C public"
+    "build": "mkdir -p public && tar -xzf liwayway-site.tar.gz -C public && node patch.js public"
   }
 }
