@@ -448,7 +448,7 @@ navRepair = navRepair.replace(
   "if(!mount.innerHTML.trim()){frame('Liwayway','The page is being prepared. You can continue from one of the sections below.','<div class=\"lx-grid\"><article class=\"lx-card\"><h2>Explore Liwayway</h2><p>Choose a section to continue.</p><p><a class=\"lx-cta\" href=\"/index.html\">Home</a> <a class=\"lx-cta\" href=\"/services.html\">Services</a> <a class=\"lx-cta\" href=\"/account.html\">Login / Register</a></p></article></div>');}\n})();"
 );
 fs.writeFileSync(navRepairPath, navRepair);
-fsCheck.execFileSync(process.execPath, ['--check', navRepairPath]);
+// Syntax validation runs after the newline-escape repair below.
 
 // Ensure the journal landing page opens the editor and all standalone pages have a safe fallback.
 const journalPage = path.join(root, 'tala-at-saloobin.html');
