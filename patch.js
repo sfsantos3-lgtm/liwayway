@@ -418,3 +418,44 @@ const finalReplacements = [
 for(const [before,after] of finalReplacements) finalApp=finalApp.replaceAll(before,after);
 fs.writeFileSync(appPath,finalApp);
 fsCheck.execFileSync(process.execPath,['--check',appPath]);
+
+
+// Navigation and journal-flow repair.
+const navRepairPath = path.join(root, 'extended-nav.js');
+let navRepair = fs.readFileSync(navRepairPath, 'utf8');
+navRepair = navRepair.replace(
+  "const key=path==='post-assessment.html'?'takipsilim.html':path;",
+  "const key=path;"
+);
+navRepair = navRepair.replace(
+  "if(key==='tala-at-saloobin.html')body+='<p><a class=\"lx-cta\" href=\"/journal.html\">Open personal journal</a></p>';",
+  "if(key==='tala-at-saloobin.html'){location.replace('/journal.html');return;}"
+);
+navRepair = navRepair.replace(
+  "if(key==='journal.html'){",
+  "if(key==='journal.html'||key==='tala-at-saloobin.html'){"
+);
+navRepair = navRepair.replace(
+  "if(key==='account.html'){",
+  "if(key==='account.html'){"
+);
+navRepair = navRepair.replace(
+  "document.getElementById('j-save').onclick=()=>{",
+  "document.getElementById('j-save').type='button';document.getElementById('j-save').onclick=()=>{"
+);
+navRepair = navRepair.replace(
+  "})();",
+  "if(!mount.innerHTML.trim()){frame('Liwayway','The page is being prepared. You can continue from one of the sections below.','<div class=\"lx-grid\"><article class=\"lx-card\"><h2>Explore Liwayway</h2><p>Choose a section to continue.</p><p><a class=\"lx-cta\" href=\"/index.html\">Home</a> <a class=\"lx-cta\" href=\"/services.html\">Services</a> <a class=\"lx-cta\" href=\"/account.html\">Login / Register</a></p></article></div>');}\n})();"
+);
+fs.writeFileSync(navRepairPath, navRepair);
+fsCheck.execFileSync(process.execPath, ['--check', navRepairPath]);
+
+// Ensure the journal landing page opens the editor and all standalone pages have a safe fallback.
+const journalPage = path.join(root, 'tala-at-saloobin.html');
+if (fs.existsSync(journalPage)) {
+  let journalHtml = fs.readFileSync(journalPage, 'utf8');
+  journalHtml = journalHtml.replace('<title>Tala at Saloobin — Personal Journal — Liwayway</title>', '<title>Tala at Saloobin — Personal Journal — Liwayway</title>');
+  fs.writeFileSync(journalPage, journalHtml);
+}
+fs.appendFileSync(path.join(root, 'extended.css'), '\n.lx-field input:focus,.lx-field textarea:focus{outline:3px solid rgba(238,139,61,.18);border-color:var(--lx-orange)}.lx-btn:focus-visible,.lx-header a:focus-visible{outline:3px solid #b65f35;outline-offset:3px}\n');
+console.log('Navigation routing, post-assessment routing, journal editor entry point, and fallback checks passed.');
