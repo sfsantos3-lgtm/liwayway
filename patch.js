@@ -299,3 +299,87 @@ if(postStart>=0&&postEnd>postStart){
  navJs=navJs.slice(0,postStart)+postFields+navJs.slice(postEnd);
 }
 fs.writeFileSync(navJsPath,navJs);
+
+
+// Local, same-origin illustrations: replace Drive hotlinks that do not load reliably in browsers.
+const graphicsDir = path.join(root, 'graphics');
+fs.mkdirSync(graphicsDir, {recursive:true});
+const svgFiles = {
+ 'house-mark.svg': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240"><rect width="240" height="240" rx="42" fill="#fff2d5"/><circle cx="120" cy="104" r="68" fill="#f7d86a"/><path d="M48 126 120 66l72 60v64H48z" fill="#fffaf2" stroke="#4b352b" stroke-width="7" stroke-linejoin="round"/><path d="M95 190v-54h50v54" fill="#ef8e83" stroke="#4b352b" stroke-width="7"/><path d="M120 27v-14M44 54 33 43M196 54l11-11" stroke="#ee8b3d" stroke-width="7" stroke-linecap="round"/></svg>`,
+ 'florals.svg': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 460"><rect width="640" height="460" rx="40" fill="#fff0d8"/><circle cx="480" cy="130" r="94" fill="#f7d86a"/><path d="M65 420Q155 300 160 115M160 420Q260 315 285 175M305 420Q390 330 425 225" fill="none" stroke="#7b8b63" stroke-width="12" stroke-linecap="round"/><g fill="#ef8e83"><ellipse cx="160" cy="125" rx="24" ry="50"/><ellipse cx="160" cy="125" rx="24" ry="50" transform="rotate(60 160 125)"/><ellipse cx="160" cy="125" rx="24" ry="50" transform="rotate(120 160 125)"/><circle cx="160" cy="125" r="17" fill="#ee8b3d"/><ellipse cx="285" cy="183" rx="22" ry="43"/><ellipse cx="285" cy="183" rx="22" ry="43" transform="rotate(60 285 183)"/><ellipse cx="285" cy="183" rx="22" ry="43" transform="rotate(120 285 183)"/><circle cx="285" cy="183" r="15" fill="#f7d86a"/></g><g fill="#f7d86a"><ellipse cx="425" cy="230" rx="21" ry="40"/><ellipse cx="425" cy="230" rx="21" ry="40" transform="rotate(60 425 230)"/><ellipse cx="425" cy="230" rx="21" ry="40" transform="rotate(120 425 230)"/><circle cx="425" cy="230" r="14" fill="#ee8b3d"/></g><path d="M160 270q-65-55-84 5 40 46 84-5M285 305q-54-48-75 2 37 40 75-2M425 340q-52-42-72 8 38 37 72-8" fill="#9baa7d"/></svg>`,
+ 'checklist.svg': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 300"><rect width="420" height="300" rx="28" fill="#fff2d5"/><rect x="115" y="34" width="190" height="232" rx="18" fill="#fffaf2" stroke="#6b5143" stroke-width="6"/><rect x="164" y="22" width="92" height="28" rx="12" fill="#ef8e83"/><g stroke="#ee8b3d" stroke-width="7" stroke-linecap="round" fill="none"><path d="m145 105 12 12 22-26M145 158l12 12 22-26M145 211l12 12 22-26"/></g><g stroke="#c9b8a5" stroke-width="7" stroke-linecap="round"><path d="M198 107h78M198 160h78M198 213h58"/></g><circle cx="330" cy="76" r="28" fill="#f7d86a"/><path d="M320 76h20M330 66v20" stroke="#5b4437" stroke-width="5" stroke-linecap="round"/></svg>`,
+ 'counseling.svg': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 300"><rect width="420" height="300" rx="28" fill="#fce4df"/><path d="M62 76q0-28 30-28h105q30 0 30 28v62q0 28-30 28h-48l-42 36v-36H92q-30 0-30-28z" fill="#fffaf2" stroke="#634c40" stroke-width="6"/><path d="M192 125q0-27 29-27h110q29 0 29 27v52q0 27-29 27h-18v32l-40-32h-52q-29 0-29-27z" fill="#f7d86a" stroke="#634c40" stroke-width="6"/><g fill="#ee8b3d"><circle cx="105" cy="109" r="8"/><circle cx="145" cy="109" r="8"/><circle cx="185" cy="109" r="8"/></g><g fill="#ef8e83"><circle cx="260" cy="151" r="8"/><circle cx="300" cy="151" r="8"/><circle cx="340" cy="151" r="8"/></g></svg>`,
+ 'growth.svg': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 300"><rect width="420" height="300" rx="28" fill="#fff0d8"/><path d="M210 250V98" stroke="#6f855c" stroke-width="12" stroke-linecap="round"/><path d="M210 178q-96-5-90-82 78-8 90 82M210 142q12-91 99-87 5 75-99 87" fill="#9bad7d" stroke="#5f7650" stroke-width="6"/><circle cx="210" cy="69" r="38" fill="#f7d86a"/><path d="M210 17V5M158 29l-9-9M262 29l9-9" stroke="#ee8b3d" stroke-width="7" stroke-linecap="round"/><path d="M95 250h230" stroke="#ef8e83" stroke-width="9" stroke-linecap="round"/></svg>`,
+ 'community.svg': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 300"><rect width="420" height="300" rx="28" fill="#fce4df"/><circle cx="210" cy="90" r="42" fill="#f7d86a"/><g fill="#ef8e83" stroke="#634c40" stroke-width="5"><circle cx="105" cy="130" r="34"/><circle cx="315" cy="130" r="34"/></g><path d="M48 255q0-72 57-72t57 72M258 255q0-72 57-72t57 72" fill="#ee8b3d" stroke="#634c40" stroke-width="5"/><path d="M139 255q0-89 71-89t71 89" fill="#f7d86a" stroke="#634c40" stroke-width="5"/></svg>`,
+ 'book.svg': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 300"><rect width="420" height="300" rx="28" fill="#fff2d5"/><path d="M210 84q-68-40-135-8v151q68-32 135 8 67-40 135-8V76q-67-32-135 8z" fill="#fffaf2" stroke="#634c40" stroke-width="7" stroke-linejoin="round"/><path d="M210 84v151M97 115q44-13 84 6M97 154q44-13 84 6M239 121q42-19 84-6M239 160q42-19 84-6" stroke="#ee8b3d" stroke-width="6" stroke-linecap="round" fill="none"/><circle cx="210" cy="54" r="20" fill="#ef8e83"/></svg>`,
+ 'contact.svg': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 300"><rect width="420" height="300" rx="28" fill="#fff0d8"/><rect x="74" y="65" width="272" height="174" rx="20" fill="#fffaf2" stroke="#634c40" stroke-width="7"/><path d="m82 83 128 99L338 83" fill="none" stroke="#ef8e83" stroke-width="10" stroke-linejoin="round"/><circle cx="320" cy="214" r="34" fill="#f7d86a" stroke="#634c40" stroke-width="6"/><path d="M306 214h28M320 200v28" stroke="#634c40" stroke-width="6" stroke-linecap="round"/></svg>`,
+ 'wellness-icons.svg': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 240"><rect width="640" height="240" rx="28" fill="#fffaf2"/><g stroke="#634c40" stroke-width="5"><circle cx="100" cy="115" r="55" fill="#f7d86a"/><circle cx="250" cy="115" r="55" fill="#ef8e83"/><circle cx="400" cy="115" r="55" fill="#ee8b3d"/><circle cx="550" cy="115" r="55" fill="#c5d0a9"/></g><path d="M74 115h52M100 89v52M224 115q26-40 52 0-26 40-52 0M380 140l20-50 20 50M530 115l14 14 28-32" fill="none" stroke="#634c40" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+ 'icon-sheet.svg': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 300"><rect width="760" height="300" rx="30" fill="#fffaf2"/><g><circle cx="110" cy="105" r="55" fill="#f7d86a"/><path d="M82 107h56M110 79v56" stroke="#634c40" stroke-width="8" stroke-linecap="round"/><circle cx="290" cy="105" r="55" fill="#ef8e83"/><path d="M262 105q28-45 56 0-28 45-56 0" fill="none" stroke="#634c40" stroke-width="7"/><circle cx="470" cy="105" r="55" fill="#ee8b3d"/><path d="M440 125q30-60 60 0M450 100h40" stroke="#634c40" stroke-width="7" fill="none" stroke-linecap="round"/><circle cx="650" cy="105" r="55" fill="#c5d0a9"/><path d="m625 105 17 18 34-39" fill="none" stroke="#634c40" stroke-width="8" stroke-linecap="round"/></g><g fill="#8a7767"><rect x="63" y="200" width="95" height="10" rx="5"/><rect x="243" y="200" width="95" height="10" rx="5"/><rect x="423" y="200" width="95" height="10" rx="5"/><rect x="603" y="200" width="95" height="10" rx="5"/></g></svg>`
+};
+for(const [name,svg] of Object.entries(svgFiles)) fs.writeFileSync(path.join(graphicsDir,name),svg);
+
+let visualApp = fs.readFileSync(appPath, 'utf8');
+const driveMap = {
+ '1UjnZPD1FIBop7GxFCsUzpuMydcp1eaKt':'/graphics/house-mark.svg',
+ '1qKTWNF5sWl6qjDpk0GtwMZdyyVfEHHSr':'/graphics/wellness-icons.svg',
+ '1oascfW1YhA0mT7t8FqAyP_bdxfltZxEs':'/graphics/florals.svg',
+ '1eZWQ_C1z26AIdfIH0HrMBBniZgfAip62':'/graphics/icon-sheet.svg',
+ '19AQkMOKS580X8rqA4HnGFcdJyxc6auM5':'/graphics/checklist.svg',
+ '1iIgUs82tZOrfLP8gSPZzBE4TWY3w9t7x':'/graphics/counseling.svg',
+ '1a41EBWwKiNnbDW-ouxhtzGUhMZ9ns4K8':'/graphics/growth.svg',
+ '1Fs1ijNgJSmS4-b1W98zjeoSExYQUQL9B':'/graphics/book.svg',
+ '1DYWkfYKeEN96OfRgG2Xlm7pF2rm6tCri':'/graphics/contact.svg'
+};
+for(const [id,local] of Object.entries(driveMap)) visualApp=visualApp.replaceAll('https://drive.google.com/uc?export=view&id='+id,local);
+const navStart=visualApp.indexOf('const nav=');
+const currentStart=visualApp.indexOf('const current=',navStart);
+if(navStart>=0&&currentStart>navStart){
+ const navCode="const nav=[['Home','/index.html','home'],['About Liwayway','/about.html','about'],['Behind Liwayway','/behind-liwayway.html','behind'],['Services','/services.html','services'],['Shared Liwayway','/shared-liwayway.html','shared'],['Steps with Liwayway','/steps-with-liwayway.html','steps'],['Contact Us','/contact.html#contact-infos','contact'],['Login / Register','/account.html','account']];\n";
+ visualApp=visualApp.slice(0,navStart)+navCode+visualApp.slice(currentStart);
+}
+const headerStart=visualApp.indexOf('const header=');
+const footerStart=visualApp.indexOf('const footer=',headerStart);
+if(headerStart>=0&&footerStart>headerStart){
+ const headerCode="const header=`<div class='topline'></div><div class='navwrap'><nav class='nav'><a class='brand' href='/index.html'><img src='${house}' alt='Liwayway house mark'><span><span class='brandname'>Liwayway</span><small>the first light</small></span></a><button class='menu' aria-label='Open navigation' aria-expanded='false'>☰</button><div class='navlinks'><a href='/index.html'>Home</a><a href='/about.html'>About Liwayway</a><a href='/behind-liwayway.html'>Behind Liwayway</a><details class='nav-dropdown'><summary>Services</summary><div class='nav-dropdown-menu'><a href='/forms.html'>Bukang Liwayway</a><a href='/services.html#liwanag-ng-araw'>Liwanag ng Araw</a><a href='/takipsilim.html'>Takipsilim</a><a href='/journal.html'>Tala at Saloobin</a></div></details><details class='nav-dropdown'><summary>Shared Liwayway</summary><div class='nav-dropdown-menu'><a href='/community.html#lightalk'>Lightalk</a><a href='/community.html#kapwa'>Kapwa</a><a href='/community.html#ratings'>Liwayway Reviews</a></div></details><details class='nav-dropdown'><summary>Steps with Liwayway</summary><div class='nav-dropdown-menu'><a href='/tanglaw-ng-kaalaman.html'>Tanglaw ng Kaalaman</a><a href='/data-privacy.html'>Data Privacy and Consent</a><a href='/frequently-asked-questions.html'>FAQs</a><a href='/crisis-support.html'>Crisis Support</a></div></details><a href='/contact.html#contact-infos'>Contact Us</a></div>${link('Login / Register','/account.html','navcta')}</nav></div>`;
+";
+ visualApp=visualApp.slice(0,headerStart)+headerCode+visualApp.slice(footerStart);
+}
+const demoReplacements = [
+ ['Doctor of Medicine (M.D.) · Board Certified Psychiatrist','Sample credentials — fictional demo content only'],
+ ['Specialized in mood disorders, anxiety, and other psychiatric conditions. Has 8 years of experience in mental health care.','Fictional sample profile only. Replace with a verified professional biography before publication.'],
+ ['Ph.D. in Clinical Psychology · Licensed Psychologist','Sample credentials — fictional demo content only'],
+ ['Specializes in emotional difficulties, stress management, and behavioral concerns. Has 7 years of experience in psychological practice.','Fictional sample profile only. Replace with a verified professional biography before publication.'],
+ ['Bachelor’s Degree in Psychology · Registered Psychometrician','Sample credentials — fictional demo content only'],
+ ['Trained in psychological testing and assessment. Has 3 years of experience in psychological assessment.','Fictional sample profile only. Replace with a verified professional biography before publication.'],
+ ['Master’s Degree in Guidance and Counseling · Registered Guidance Counselor','Sample credentials — fictional demo content only'],
+ ['Specializes in personal development, academic concerns, and emotional support. Has 5 years of counseling experience.','Fictional sample profile only. Replace with a verified professional biography before publication.'],
+ ['Department of Health (DOH)','Sample government partner category (fictional demo)'],
+ ['National Center for Mental Health (NCMH)','Sample mental health institution category (fictional demo)'],
+ ['A proposed government partner that promotes mental health awareness and supports initiatives that improve access to mental health services in the Philippines.','Illustrative placeholder only. This does not indicate an actual partnership or affiliation.'],
+ ['A proposed partner that supports mental health advocacy and promotes awareness about available mental health resources and services.','Illustrative placeholder only. This does not indicate an actual partnership or affiliation.'],
+ ['[Office address]','To be confirmed — not yet published'],
+ ['[Telephone number]','Not yet published'],
+ ['[Email address]','hello@liwayway.example (demo address; not monitored)'],
+ ['The Reviews section is marked Pending in the supplied services document.','Sample testimonial (fictional demo only): “The welcoming space helped me reflect on what I was feeling.” This is not a real client review.']
+];
+for(const [before,after] of demoReplacements) visualApp=visualApp.replaceAll(before,after);
+fs.writeFileSync(appPath,visualApp);
+
+fs.appendFileSync(path.join(root,'styles.css'), `
+/* Expanded navigation and local illustration support */
+.navlinks{align-items:center;gap:clamp(9px,1.3vw,18px)}
+.navlinks>a,.nav-dropdown>summary{font:600 12px var(--sans);color:var(--ink);text-decoration:none;cursor:pointer;list-style:none}
+.nav-dropdown{position:relative}
+.nav-dropdown>summary::-webkit-details-marker{display:none}
+.nav-dropdown>summary:after{content:'⌄';margin-left:5px;color:var(--orange)}
+.nav-dropdown[open]>summary{color:#b65f35}
+.nav-dropdown-menu{position:absolute;top:calc(100% + 12px);left:0;min-width:205px;padding:9px;background:#fffaf2;border:1px solid var(--line);border-radius:14px;box-shadow:0 14px 35px rgba(70,48,30,.14);display:grid;gap:2px;z-index:50}
+.nav-dropdown-menu a{padding:10px 12px;border-radius:9px;color:var(--ink);font:600 12px var(--sans);text-decoration:none}
+.nav-dropdown-menu a:hover{background:#fff0d8}
+.nav .navcta{white-space:nowrap}
+.art-florals,.service-graphic,.section-graphic,.icon-sheet,.card-icon,.contact-graphic{object-fit:contain}
+@media(max-width:1000px){.navlinks{gap:9px}.navlinks>a,.nav-dropdown>summary{font-size:11px}}
+@media(max-width:760px){.navlinks{align-items:flex-start;flex-direction:column}.nav-dropdown-menu{position:static;box-shadow:none;margin-top:7px}.nav-dropdown{width:100%}.nav-dropdown-menu a{padding:8px 12px}}
+`);
+fsCheck.execFileSync(process.execPath,['--check',appPath]);
+console.log('Local graphics, dropdown navigation, and demo-content safeguards added.');
