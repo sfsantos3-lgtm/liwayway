@@ -717,3 +717,57 @@ formsBackendConsent = formsBackendConsent.replace(
 );
 fs.writeFileSync(path.join(root, 'forms-backend.js'), formsBackendConsent);
 fsCheck.execFileSync(process.execPath, ['--check', path.join(root, 'forms-backend.js')]);
+
+
+// Unify navigation across the original site and every standalone service page.
+const unifiedLiwaywayHeader = "<div class='topline'></div><div class='navwrap'><nav class='nav'><a class='brand' href='/index.html'><img src='/graphics/house-mark.svg' alt='Liwayway house mark'><span><span class='brandname'>Liwayway</span><small>the first light</small></span></a><button class='menu' aria-label='Open navigation' aria-expanded='false'>☰</button><div class='navlinks'><a href='/index.html'>Home</a><a href='/about.html'>About Liwayway</a><a href='/behind-liwayway.html'>Behind Liwayway</a><details class='nav-dropdown'><summary>Services</summary><div class='nav-dropdown-menu'><a href='/forms.html'>Bukang Liwayway</a><a href='/services.html#liwanag-ng-araw'>Liwanag ng Araw</a><a href='/takipsilim.html'>Takipsilim</a><a href='/journal.html'>Tala at Saloobin</a></div></details><details class='nav-dropdown'><summary>Shared Liwayway</summary><div class='nav-dropdown-menu'><a href='/community.html#lightalk'>Lightalk</a><a href='/community.html#kapwa'>Kapwa</a><a href='/community.html#ratings'>Liwayway Reviews</a></div></details><details class='nav-dropdown'><summary>Steps with Liwayway</summary><div class='nav-dropdown-menu'><a href='/tanglaw-ng-kaalaman.html'>Tanglaw ng Kaalaman</a><a href='/data-privacy.html'>Data Privacy and Consent</a><a href='/frequently-asked-questions.html'>FAQs</a><a href='/crisis-support.html'>Crisis Support</a></div></details><a href='/contact.html#contact-infos'>Contact Us</a></div><a class='navcta' href='/account.html'>Login / Register<span aria-hidden='true'>↗</span></a></nav></div>";
+
+const unifiedNavPath = path.join(root, 'extended-nav.js');
+let unifiedNavScript = fs.readFileSync(unifiedNavPath, 'utf8');
+const navDeclarationStart = unifiedNavScript.indexOf('const nav=');
+const pagesDeclarationStart = unifiedNavScript.indexOf('\nconst pages=', navDeclarationStart);
+if (navDeclarationStart < 0 || pagesDeclarationStart < 0) throw new Error('Could not locate shared navigation declaration.');
+unifiedNavScript = unifiedNavScript.slice(0, navDeclarationStart) +
+  'const nav=' + JSON.stringify(unifiedLiwaywayHeader) + ';' +
+  unifiedNavScript.slice(pagesDeclarationStart);
+unifiedNavScript = unifiedNavScript.replace(/if\(!mount\)\{const existing=.*?return;\}/s, 'if(!mount)return;');
+unifiedNavScript = unifiedNavScript.replace(
+  "mount.innerHTML=nav+'<section class=\"lx-hero\">",
+  "mount.innerHTML=nav+'<section class=\"lx-hero\">"
+);
+unifiedNavScript = unifiedNavScript.replace(
+  "+'</footer>';}",
+  "+'</footer>';const menu=mount.querySelector('.menu');const links=mount.querySelector('.navlinks');if(menu&&links)menu.addEventListener('click',()=>{const opened=links.classList.toggle('open');menu.setAttribute('aria-expanded',String(opened));menu.textContent=opened?'×':'☰';});}"
+);
+fs.writeFileSync(unifiedNavPath, unifiedNavScript);
+fsCheck.execFileSync(process.execPath, ['--check', unifiedNavPath]);
+
+// The six main pages already render the correct dropdown header from app.js.
+// Do not append a second set of navigation links to them.
+for (const file of ['index.html','about.html','services.html','community.html','resources.html','contact.html']) {
+  const filePath = path.join(root, file);
+  if (!fs.existsSync(filePath)) continue;
+  let html = fs.readFileSync(filePath, 'utf8');
+  html = html.replace(/<script src="\/extended-nav\.js" defer><\/script>/g, '');
+  fs.writeFileSync(filePath, html);
+}
+
+// Standalone pages use the same global stylesheet and shared header as the main pages.
+const standaloneNavPages = [
+  ...Object.keys(extendedPages),
+  ...Object.keys(extraPages),
+  'post-assessment.html','journal.html','account.html'
+];
+for (const file of standaloneNavPages) {
+  const filePath = path.join(root, file);
+  if (!fs.existsSync(filePath)) continue;
+  let html = fs.readFileSync(filePath, 'utf8');
+  if (!html.includes('href="/styles.css"')) {
+    html = html.replace('</head>', '<link rel="stylesheet" href="/styles.css"></head>');
+  }
+  if (!html.includes('src="/extended-nav.js"')) {
+    html = html.replace('</body>', '<script src="/extended-nav.js" defer></script></body>');
+  }
+  fs.writeFileSync(filePath, html);
+}
+console.log('Unified navigation: one shared header, eight primary destinations, three dropdowns; duplicate page links removed.');
