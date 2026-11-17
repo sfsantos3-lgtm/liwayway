@@ -76,3 +76,7 @@ fs.writeFileSync(path.join(root, 'forms-page.js'), formsSource);
 fsCheck.execFileSync(process.execPath, ['--check', appPath]);
 fsCheck.execFileSync(process.execPath, ['--check', path.join(root, 'forms-page.js')]);
 console.log('Liwayway forms, page scripts, and status cleanup checks passed.');
+
+formsSource = formsSource.replace(/\\\"/g, '"');
+fs.writeFileSync(path.join(root, 'forms-page.js'), formsSource);
+fsCheck.execFileSync(process.execPath, ['--check', path.join(root, 'forms-page.js')]);
