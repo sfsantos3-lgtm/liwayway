@@ -291,3 +291,11 @@ navJs = navJs.replace(
  "'<a href=\"/account.html\">Login / Register</a><a href=\"/tanglaw-ng-kaalaman.html\">Tanglaw ng Kaalaman</a><a href=\"/data-privacy.html\">Data Privacy</a><a href=\"/frequently-asked-questions.html\">FAQs</a><a href=\"/crisis-support.html\">Crisis Support</a><a href=\"/user-dashboard.html\">User Dashboard</a>'"
 );
 fs.writeFileSync(navJsPath,navJs);
+
+const postStart = navJs.indexOf('const questions=[');
+const postEnd = navJs.indexOf("frame('Post-Counseling Assessment'", postStart);
+if(postStart>=0&&postEnd>postStart){
+ const postFields = "const questions=['Follow-up questions about the counseling experience','Current emotional condition','Changes in mood and behavior','Progress after counseling','Effectiveness of coping strategies','Areas that still need improvement','Additional concerns or feedback'];\\nconst q=questions.map((label,i)=>'<label class=\\"lx-field\\">'+(i+1)+'. '+label+'<textarea rows=\\"3\\" name=\\"post'+i+'\\" '+(i<6?'required':'')+' placeholder=\\"Your response\\"></textarea></label>').join('');\\n";
+ navJs=navJs.slice(0,postStart)+postFields+navJs.slice(postEnd);
+}
+fs.writeFileSync(navJsPath,navJs);
