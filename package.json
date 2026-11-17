@@ -1,6 +1,6 @@
 {
   "private": true,
   "scripts": {
-    "build": "mkdir -p public && tar -xzf liwayway-site.tar.gz -C public --strip-components=1"
+    "build": "mkdir -p public && tar -xzf liwayway-site.tar.gz -C public"
   }
 }
