@@ -459,3 +459,159 @@ if (fs.existsSync(journalPage)) {
 }
 fs.appendFileSync(path.join(root, 'extended.css'), '\n.lx-field input:focus,.lx-field textarea:focus{outline:3px solid rgba(238,139,61,.18);border-color:var(--lx-orange)}.lx-btn:focus-visible,.lx-header a:focus-visible{outline:3px solid #b65f35;outline-offset:3px}\n');
 console.log('Navigation routing, post-assessment routing, journal editor entry point, and fallback checks passed.');
+
+ 
+// Build-time public Supabase config. Only the URL and anon/public key are exposed.
+const supabasePublicConfig = {
+  url: process.env.LIWAYWAY_SUPABASE_URL || '',
+  anonKey: process.env.LIWAYWAY_SUPABASE_ANON_KEY || ''
+};
+fs.writeFileSync(path.join(root, 'supabase-config.js'),
+  'window.LIWAYWAY_SUPABASE_CONFIG = ' + JSON.stringify(supabasePublicConfig) + ';');
+
+const backendUi = String.raw`(function(){
+  const config = window.LIWAYWAY_SUPABASE_CONFIG || {};
+  const path = location.pathname.split('/').pop() || 'index.html';
+  const app = window.supabase;
+  const esc = value => String(value == null ? '' : value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const status = (node, message, bad) => { if(node){ node.textContent=message; node.style.color=bad?'#a33d32':'#79552e'; } };
+  const hasConfig = !!(config.url && config.anonKey && app && app.createClient);
+  if (!hasConfig) {
+    if (path === 'account.html') {
+      const wrap=document.querySelector('#lx-app .lx-wrap');
+      if(wrap) wrap.innerHTML='<div class="lx-note">The secure account backend is not connected yet. Login and registration will become active after the Liwayway Supabase project is connected. No credentials are collected in this preview.</div>';
+    }
+    if (path === 'journal.html') {
+      const save=document.getElementById('j-save');
+      if(save) save.disabled=true;
+      const note=document.querySelector('#lx-app .lx-note');
+      status(note,'Private journal storage is not connected yet. Please do not enter personal or sensitive information until the secure backend is enabled.',true);
+    }
+    return;
+  }
+  const db = app.createClient(config.url, config.anonKey, {auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+  window.liwaywaySupabase = db;
+
+  async function currentUser(){
+    const result=await db.auth.getUser();
+    if(result.error) throw result.error;
+    return result.data.user;
+  }
+
+  if(path==='account.html'){
+    const wrap=document.querySelector('#lx-app .lx-wrap');
+    if(!wrap) return;
+    wrap.innerHTML =
+      '<div class="lx-grid">'+
+      '<form class="lx-form" id="lx-login"><h2>Login</h2>'+
+      '<label class="lx-field">School email address<input name="email" type="email" autocomplete="email" required></label>'+
+      '<label class="lx-field">Password<input name="password" type="password" autocomplete="current-password" required></label>'+
+      '<div class="lx-actions"><button class="lx-btn" type="submit">Login</button></div><p id="lx-login-status" aria-live="polite"></p>'+
+      '<p><a href="#" id="lx-forgot">Forgot password?</a></p></form>'+
+      '<form class="lx-form" id="lx-register"><h2>Register</h2>'+
+      '<label class="lx-field">Full name<input name="full_name" autocomplete="name" required></label>'+
+      '<label class="lx-field">School email address<input name="email" type="email" autocomplete="email" required></label>'+
+      '<label class="lx-field">Password<input name="password" type="password" minlength="8" autocomplete="new-password" required></label>'+
+      '<label class="lx-field">Confirm password<input name="confirm" type="password" minlength="8" autocomplete="new-password" required></label>'+
+      '<label class="lx-choice"><input type="checkbox" name="privacy" required><span>I have reviewed the Liwayway privacy notice and agree to the processing described there.</span></label>'+
+      '<div class="lx-actions"><button class="lx-btn" type="submit">Create account</button></div><p id="lx-register-status" aria-live="polite"></p></form></div>'+
+      '<p class="lx-note">Use a test account and non-sensitive sample information while evaluating this preview. Email confirmation may be required before the first login.</p>';
+    document.getElementById('lx-login').addEventListener('submit',async e=>{
+      e.preventDefault();const form=e.currentTarget;const data=new FormData(form);const out=document.getElementById('lx-login-status');
+      try{const {error}=await db.auth.signInWithPassword({email:data.get('email'),password:data.get('password')});if(error)throw error;location.href='/user-dashboard.html';}
+      catch(err){status(out,err.message||'Unable to log in.',true);}
+    });
+    document.getElementById('lx-register').addEventListener('submit',async e=>{
+      e.preventDefault();const form=e.currentTarget;const data=new FormData(form);const out=document.getElementById('lx-register-status');
+      if(data.get('password')!==data.get('confirm')){status(out,'The passwords do not match.',true);return;}
+      try{
+        const {data:result,error}=await db.auth.signUp({email:data.get('email'),password:data.get('password'),options:{data:{full_name:data.get('full_name')},emailRedirectTo:location.origin+'/account.html'}});
+        if(error)throw error;
+        if(result.session){location.href='/user-dashboard.html';return;}
+        status(out,'Account created. Check your school email for the confirmation link, then return here to log in.',false);
+      }catch(err){status(out,err.message||'Unable to create the account.',true);}
+    });
+    document.getElementById('lx-forgot').addEventListener('click',async e=>{
+      e.preventDefault();const email=document.querySelector('#lx-login [name="email"]').value.trim();const out=document.getElementById('lx-login-status');
+      if(!email){status(out,'Enter your email address first.',true);return;}
+      try{const {error}=await db.auth.resetPasswordForEmail(email,{redirectTo:location.origin+'/account.html'});if(error)throw error;status(out,'If an account exists for that email, a password-reset link has been sent.',false);}
+      catch(err){status(out,err.message||'Unable to request a reset link.',true);}
+    });
+    return;
+  }
+
+  if(path==='journal.html'){
+    const wrap=document.querySelector('#lx-app .lx-wrap');
+    if(!wrap) return;
+    wrap.innerHTML='<div class="lx-form"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap"><h2>Write an entry</h2><button class="lx-btn secondary" id="lx-logout" type="button">Log out</button></div>'+
+      '<label class="lx-field">Journal title<input id="j-title" maxlength="160" required placeholder="Title of your entry"></label>'+
+      '<label class="lx-field">Date<input id="j-date" type="date" required></label>'+
+      '<label class="lx-field">Journal entry<textarea id="j-content" rows="8" maxlength="20000" required placeholder="Write your thoughts here..."></textarea></label>'+
+      '<div class="lx-actions"><button class="lx-btn" id="j-save" type="button">Save entry</button><button class="lx-btn secondary" id="j-cancel" type="button" hidden>Cancel edit</button></div>'+
+      '<p id="j-status" aria-live="polite"></p><h2>Previous entries</h2><div id="j-list">Loading your private entries…</div>'+
+      '<p class="lx-note">Your journal entries are stored in your private account and protected by database row-level security. Only your signed-in account can read or change them.</p></div>';
+    const title=document.getElementById('j-title'),date=document.getElementById('j-date'),content=document.getElementById('j-content');
+    const save=document.getElementById('j-save'),cancel=document.getElementById('j-cancel'),list=document.getElementById('j-list'),out=document.getElementById('j-status');
+    date.value=new Date().toISOString().slice(0,10);
+    let user=null,editing=null;
+    function render(rows){
+      list.innerHTML=rows.length?rows.map(row=>'<article class="lx-entry"><strong>'+esc(row.title)+'</strong><p>'+esc(row.entry_date)+'</p><p>'+esc(row.content).replace(/\n/g,'<br>')+'</p><button class="lx-btn secondary" type="button" data-edit="'+esc(row.id)+'">Edit</button> <button class="lx-btn secondary" type="button" data-delete="'+esc(row.id)+'">Delete</button></article>').join(''):'No entries yet. Your saved entries will appear here.';
+      list.querySelectorAll('[data-edit]').forEach(button=>button.addEventListener('click',()=>{
+        const row=rows.find(item=>item.id===button.dataset.edit);if(!row)return;
+        editing=row.id;title.value=row.title;date.value=row.entry_date;content.value=row.content;save.textContent='Update entry';cancel.hidden=false;title.focus();
+      }));
+      list.querySelectorAll('[data-delete]').forEach(button=>button.addEventListener('click',async()=>{
+        if(!confirm('Delete this journal entry? This cannot be undone.'))return;
+        try{const {error}=await db.from('journal_entries').delete().eq('id',button.dataset.delete).eq('user_id',user.id);if(error)throw error;await load();}
+        catch(err){status(out,err.message||'Unable to delete entry.',true);}
+      }));
+    }
+    async function load(){
+      const {data,error}=await db.from('journal_entries').select('id,title,entry_date,content,created_at,updated_at').eq('user_id',user.id).order('entry_date',{ascending:false}).order('created_at',{ascending:false});
+      if(error)throw error;render(data||[]);
+    }
+    try{
+      user=await currentUser();
+      if(!user){wrap.innerHTML='<div class="lx-card"><h2>Sign in to open your private journal</h2><p>Your journal belongs to your account and is not available to visitors.</p><a class="lx-cta" href="/account.html">Login / Register</a></div>';return;}
+      await load();
+    }catch(err){status(out,err.message||'Unable to load your journal.',true);return;}
+    save.addEventListener('click',async()=>{
+      if(!title.value.trim()||!content.value.trim()){status(out,'Add a title and journal entry before saving.',true);return;}
+      save.disabled=true;
+      try{
+        const record={title:title.value.trim(),entry_date:date.value||new Date().toISOString().slice(0,10),content:content.value.trim(),user_id:user.id};
+        const result=editing?await db.from('journal_entries').update(record).eq('id',editing).eq('user_id',user.id):await db.from('journal_entries').insert(record);
+        if(result.error)throw result.error;
+        title.value='';content.value='';date.value=new Date().toISOString().slice(0,10);editing=null;save.textContent='Save entry';cancel.hidden=true;status(out,'Journal entry saved.',false);await load();
+      }catch(err){status(out,err.message||'Unable to save your entry.',true);}
+      finally{save.disabled=false;}
+    });
+    cancel.addEventListener('click',()=>{editing=null;title.value='';content.value='';date.value=new Date().toISOString().slice(0,10);save.textContent='Save entry';cancel.hidden=true;});
+    document.getElementById('lx-logout').addEventListener('click',async()=>{await db.auth.signOut();location.href='/account.html';});
+    return;
+  }
+
+  if(path==='user-dashboard.html'){
+    const wrap=document.querySelector('#lx-app .lx-wrap');if(!wrap)return;
+    try{
+      const user=await currentUser();
+      if(!user){wrap.innerHTML='<div class="lx-card"><h2>Please log in first</h2><a class="lx-cta" href="/account.html">Login / Register</a></div>';return;}
+      const {data:profile}=await db.from('profiles').select('full_name,school_email').eq('id',user.id).maybeSingle();
+      const {data:appointments}=await db.from('appointment_requests').select('id,consultation_type,appointment_date,preferred_time,status').eq('user_id',user.id).order('created_at',{ascending:false});
+      wrap.innerHTML='<div class="lx-card"><h2>Welcome, '+esc(profile&&profile.full_name||user.email)+'</h2><p>Manage your Liwayway account and personal services.</p><div class="lx-actions"><a class="lx-cta" href="/journal.html">Open Tala at Saloobin</a><a class="lx-cta" href="/forms.html">Request an appointment</a><button class="lx-btn secondary" id="lx-dash-logout" type="button">Log out</button></div></div><div class="lx-card" style="margin-top:18px"><h2>Your appointment requests</h2>'+(appointments&&appointments.length?appointments.map(a=>'<p>'+esc(a.consultation_type)+' · '+esc(a.appointment_date)+' · '+esc(a.preferred_time)+' · '+esc(a.status)+'</p>').join(''):'<p>You have no appointment requests yet.</p>')+'</div>';
+      document.getElementById('lx-dash-logout').addEventListener('click',async()=>{await db.auth.signOut();location.href='/account.html';});
+    }catch(err){wrap.innerHTML='<div class="lx-note">'+esc(err.message||'Unable to load dashboard.')+'</div>';}
+  }
+})();`;
+fs.writeFileSync(path.join(root,'backend-ui.js'), backendUi);
+const addBackendScripts = file => {
+  const filePath=path.join(root,file);
+  if(!fs.existsSync(filePath)) return;
+  let html=fs.readFileSync(filePath,'utf8');
+  if(!html.includes('/backend-ui.js')){
+    const tags='<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/supabase-config.js"></script><script src="/backend-ui.js" defer></script>';
+    html=html.replace('</body>',tags+'</body>');
+    fs.writeFileSync(filePath,html);
+  }
+};
+['account.html','journal.html','tala-at-saloobin.html','user-dashboard.html'].forEach(addBackendScripts);
