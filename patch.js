@@ -771,3 +771,34 @@ for (const file of standaloneNavPages) {
   fs.writeFileSync(filePath, html);
 }
 console.log('Unified navigation: one shared header, eight primary destinations, three dropdowns; duplicate page links removed.');
+
+// Liwayway pastel refinement 2026-11-18.
+{
+const appFile=path.join(root,'app.js');
+let app=fs.readFileSync(appFile,'utf8');
+app=app.replace(/const nav=\[[\s\S]*?\];/,"const nav=[['Home','/index.html','home'],['About Liwayway','/about.html','about'],['Liwanag ng Araw','/services.html','services'],['Shared Liwayway','/community.html','community'],['Steps with Liwayway','/resources.html','resources'],['Contact Us','/contact.html#contact-infos','contact'],['Login / Register','/account.html','account']];");
+const header="const header='<div class=\"topline\"></div><div class=\"navwrap\"><nav class=\"nav\"><a class=\"brand\" href=\"/index.html\"><img src=\"/graphics/house-mark.svg\" alt=\"Liwayway\"><span><span class=\"brandname\">Liwayway</span><small>the first light</small></span></a><button class=\"menu\" aria-label=\"Open navigation\" aria-expanded=\"false\">☰</button><div class=\"navlinks\"><a href=\"/index.html\">Home</a><a href=\"/about.html\">About Liwayway</a><a href=\"/services.html\">Liwanag ng Araw</a><a href=\"/community.html\">Shared Liwayway</a><a href=\"/resources.html\">Steps with Liwayway</a><a href=\"/contact.html#contact-infos\">Contact Us</a></div><a class=\"navcta\" href=\"/account.html\">Login / Register ↗</a></nav></div>';";
+app=app.replace(/const header=[\x60][\s\S]*?[\x60];/,header);
+app=app.replace('<div class=\"eyebrow\">Behind Liwayway</div><h2>Behind Liwayway</h2>','<div class=\"eyebrow\">Our people</div><h2>Meet the Liwayway team</h2>');
+app=app.replace('<section class=\"section\"><div class=\"container\"><div class=\"section-head\"><div><div class=\"eyebrow\">Our people</div>','<section class=\"section anchor\" id=\"behind-liwayway\"><div class=\"container\"><div class=\"section-head\"><div><div class=\"eyebrow\">Our people</div>');
+const demo=' <span class=\"demo-label\">Sample profile · fictional demo</span>';
+app=app.replaceAll('Sample credentials — fictional demo content only','Sample credentials · fictional demo');
+app=app.replaceAll('Fictional sample profile only. Replace with a verified professional biography before publication.','Demonstration biography: this fictional profile focuses on the role and areas of practice described in the project brief.');
+app=app.replaceAll('Fictional sample biography only. Replace with verified details before publication.','Demonstration biography: fictional staff background based on the role described in the project brief.');
+app=app.replaceAll('Sample background — fictional demo only','Sample background · fictional demo');
+app=app.replace('<div class=\"eyebrow\">Sponsors and partners</div><h2>Sponsors and Partners</h2>','<div class=\"eyebrow\">Sponsors and partners · proposed</div><h2>Sponsors and Partners</h2>');
+app=app.replace('Sample government partner category (fictional demo)','Department of Health (DOH) · proposed partner');
+app=app.replace('Sample mental health institution category (fictional demo)','National Center for Mental Health (NCMH) · proposed partner');
+app=app.replace('Sample non-governmental partner (fictional demo)','Non-Governmental Organizations (NGOs) · proposed partner');
+app=app.replace('Sample corporate sponsor (fictional demo)','Private Donors and Corporate Sponsors · proposed sponsor');
+app=app.replace('Illustrative placeholder only. This does not indicate an actual partnership or affiliation.','Proposed partnership category only; no confirmed affiliation is implied.');
+app=app.replace('Illustrative placeholder only; no actual partnership or affiliation is implied.','Proposed partnership category only; no confirmed affiliation is implied.');
+app=app.replace('hello@liwayway.example (demo address; not monitored)','rcbarlongo3008qc@student.fatima.edu.ph');
+app=app.replace('To be confirmed — not yet published','No physical office address is published for this demo.');
+app=app.replace('Not yet published','No telephone number is published for this demo.');
+app=app.replace('id=\"lightalk\"','id=\"lightalk\"');
+fs.writeFileSync(appFile,app);
+fs.appendFileSync(path.join(root,'styles.css'), '\n:root{--cream:#fff8ef;--paper:#fffdf8;--yellow:#f8e8a6;--orange:#f2c49a;--coral:#f3c4bf;--ink:#443832;--muted:#82736a;--line:#eee1d4}\nbody{background:#fff8ef;color:#443832}.topline{background:linear-gradient(90deg,#f8e8a6 0 33%,#f2c49a 33% 66%,#f3c4bf 66%)}.navwrap{background:rgba(255,248,239,.96)}.btn.orange{background:#f2c49a;color:#49372d}.btn.coral{background:#f3c4bf;color:#49372d}.btn.yellow{background:#f8e8a6;color:#49372d}.card.yellow{background:#fff4cf;border-color:#f0e2b4}.card.coral{background:#fce9e5;border-color:#efd4ce}.card.orange{background:#ffeddd;border-color:#efd8c4}.service-graphic,.section-graphic,.card-icon,.icon-sheet,.contact-graphic,.art-florals{filter:saturate(.62) brightness(1.06);opacity:.92}.faq details{background:#fffdf8;border:1px solid #eee1d4;border-radius:13px;margin:10px 0;padding:16px 20px}.faq summary{cursor:pointer;color:#57463c;font-weight:700}\n');
+fsCheck.execFileSync(process.execPath,['--check',appFile]);
+console.log('Liwayway navigation, pastel styling, and demo profile copy updated.');
+}
